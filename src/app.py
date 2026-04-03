@@ -1,3 +1,5 @@
+from fastapi import Request
+from fastapi.responses import JSONResponse
 """
 High School Management System API
 
@@ -18,6 +20,19 @@ app = FastAPI(title="Mergington High School API",
 current_dir = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=os.path.join(Path(__file__).parent,
           "static")), name="static")
+
+
+
+# Novo endpoint para remover participante
+@app.delete("/activities/{activity_name}/participants/{email}")
+def remove_participant(activity_name: str, email: str):
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    activity = activities[activity_name]
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Participant not found in this activity")
+    activity["participants"].remove(email)
+    return {"message": f"{email} removido de {activity_name}"}
 
 # In-memory activity database
 activities = {
